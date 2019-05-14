@@ -449,19 +449,36 @@ if (!class_exists('Licensing\EpitroveLicense')) {
                 return false;
             }
 
-            switch ($licenseData->code) {
-                
-                case EPITROVE_API_SUCCESS_CODE: // Action was successful on api side
-                    if($this->isLicenseActivateRequest($product)){
-                        $product->updateLicenseStatus('valid');
-                    }
+            // Action was successful on api side
+            if($licenseData->code == EPITROVE_API_SUCCESS_CODE){
+                if($this->isLicenseActivateRequest($product)){
+                    $product->updateLicenseStatus('valid');
+                }
 
-                    if($this->isLicenseDeactivateRequest($product)){
-                        $product->updateLicenseStatus('deactivated');
-                    }
+                if($this->isLicenseDeactivateRequest($product)){
+                    $product->updateLicenseStatus('deactivated');
+                }
 
-                    break;
+                return;
+            }
 
+            static::updateLicenseStatusFromApiResponse($licenseData->code, $product);
+        }
+
+        /**
+         * Update License status if response code is not 200 & 4001
+         *
+         * @param string $code Response Code returned by API.
+         * @param EpitroveProduct $product Epitrove Product Object.
+         * @return void
+         */
+        public static function updateLicenseStatusFromApiResponse($code, $product){
+            
+            if(in_array($code, [EPITROVE_API_SUCCESS_CODE, 4001])){
+                return;
+            }
+
+            switch ($code) {
                 case 4003:
                     // License Expired.
                     $product->updateLicenseStatus('expired');
@@ -475,7 +492,6 @@ if (!class_exists('Licensing\EpitroveLicense')) {
                 default:
                     $product->updateLicenseStatus('deactivated');
             }
-
         }
 
         /**

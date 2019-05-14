@@ -140,6 +140,7 @@ if (!class_exists('Licensing\EpitroveUpdater')) {
         {
             $updateDetails = $this->getCachedUpdateInfo();
             if (false === $updateDetails || $this->isForcedUpdateCheck) {
+                
                 $updateApiResponse = $this->apiRequest(
                     array(
                         'slug'       =>  $this->product->productSlug(),
@@ -147,10 +148,22 @@ if (!class_exists('Licensing\EpitroveUpdater')) {
                     )
                 );
 
-                if (isset($updateApiResponse->data)) {
+                // If status of license key is changed, api response will tell us that,
+                // so we'll have to change license status here too.
+                if(isset($updateApiResponse->code)){
+                    EpitroveLicense::updateLicenseStatusFromApiResponse($updateApiResponse->code, $this->product);
+                }
+
+                // Let's cache the response only if it is a 200 response code.
+                if(
+                    isset($updateApiResponse->code) && 
+                    $updateApiResponse->code == EPITROVE_API_SUCCESS_CODE &&
+                    isset($updateApiResponse->data)
+                ){
                     $updateDetails = $updateApiResponse->data;
                     $this->setUpdateInfoCache($updateDetails);
                 }
+
             }
 
             if (isset($updateDetails->new_version) && version_compare($this->product->productVersion(), $updateDetails->new_version, '<')) {
@@ -193,11 +206,7 @@ if (!class_exists('Licensing\EpitroveUpdater')) {
             );
             
             if (!is_wp_error($request)) {
-                $response = json_decode(wp_remote_retrieve_body($request));
-
-                if(isset($response->code) && EPITROVE_API_SUCCESS_CODE == $response->code){
-                    return $response;
-                }
+                return json_decode(wp_remote_retrieve_body($request));
             }
            
             // Return blank object
