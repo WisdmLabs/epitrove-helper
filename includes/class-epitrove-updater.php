@@ -63,7 +63,6 @@ if (!class_exists('Licensing\EpitroveUpdater')) {
             } elseif ($this->productType == 'plugin') {
                 add_filter('pre_set_site_transient_update_plugins', array($this, 'checkForProductUpdate'));
                 add_filter('pre_set_transient_update_plugins', array($this, 'checkForProductUpdate'));
-                remove_action( 'after_plugin_row_' . $this->name, 'wp_plugin_update_row', 10 );
             }
 
             add_filter('http_request_args', array($this, 'whitelistEpitroveUrls'), 10, 2);
@@ -167,6 +166,15 @@ if (!class_exists('Licensing\EpitroveUpdater')) {
             }
 
             if (isset($updateDetails->new_version) && version_compare($this->product->productVersion(), $updateDetails->new_version, '<')) {
+                // Prepare data required for WordPress Updater to work properly
+                if($this->product->isTheme() && !isset($updateDetails->theme)){
+                    $updateDetails->theme = $this->product->productSlug();
+                }
+
+                if(!$this->product->isTheme() && !isset($updateDetails->slug)){
+                    $updateDetails->slug = $this->product->productSlug();
+                }
+
                 $transientData->response[ $this->name ] = $this->product->isTheme() ? $this->convertObjectToArray($updateDetails) : $updateDetails;
             }
             

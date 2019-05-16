@@ -31,9 +31,9 @@ run_epitrove_helper();
 // Check updates for epitrove-helper addon
 
 $addOnUpdater = Puc_v4_Factory::buildUpdateChecker(
-    'https://github.com/WisdmLabs/epitrove-helper-addon',
+    'https://github.com/WisdmLabs/epitrove-helper',
     __FILE__,
-    'epitrove-helper-addon'
+    'epitrove-helper'
 );
 
 $addOnUpdater->setBranch('master');
