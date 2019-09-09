@@ -8,11 +8,29 @@ if (!class_exists('Licensing\EpitroveLicense')) {
      */
     class EpitroveLicense
     {
+        use ThirdPartyDevelopers;
+
         private $epitroveProducts = [];
         public $pluginSlug = null;
         private $responseStatus = [];
 
-        public function __construct()
+        /**
+         * Making this class singleton because some of its public methods are 
+         * going to be used by static methods.
+         *
+         * @return EpitroveLicense
+         */
+        public static function getInstance() {
+
+            static $instance = false;
+            if( $instance === false ) {
+              $instance = new static();
+            }
+      
+            return $instance;
+        }
+
+        private function __construct()
         {
             $this->pluginSlug = 'epitrove-helper';
 
@@ -25,6 +43,21 @@ if (!class_exists('Licensing\EpitroveLicense')) {
             add_action('admin_enqueue_scripts', array($this, 'enqueueLicenseStyles'));
 
         }
+
+        /**
+         * Make clone magic method private, so nobody can clone instance.
+         */
+        private function __clone() {}
+
+        /**
+         * Make sleep magic method private, so nobody can serialize instance.
+         */
+        private function __sleep() {}
+    
+        /**
+         * Make wakeup magic method private, so nobody can unserialize instance.
+         */
+        private function __wakeup() {}
 
         /**
          * Defines constant required for Epitrove Helper Addon
@@ -672,26 +705,6 @@ if (!class_exists('Licensing\EpitroveLicense')) {
         private static function getRegisteredEmail()
         {
             return get_option(REGISTERED_EMAIL_KEY, '');
-        }
-
-        /**
-         * Method for Third Party Developers to check if License of their product 
-         * is active or not.
-         * 
-         *
-         * @param string $productSlug productSlug defined in epitrove-config.php
-         * @return boolean
-         */
-        public static function isActive($productSlug)
-        {
-            // Get license status
-            $status = get_option('epi_' . $productSlug . '_license_status');
-
-            if (in_array($status, self::activeLicenseStatuses())) {
-                return true;
-            }
-
-            return false;
         }
 
         /**

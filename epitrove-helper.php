@@ -3,7 +3,7 @@
  * Plugin Name:       Epitrove Helper
  * Plugin URI:        http://wisdmlabs.com
  * Description:       Licensing addon for all epitrove products.
- * Version:           1.0
+ * Version:           1.1
  * Author:            WisdmLabs
  * Author URI:        http://wisdmlabs.com/
  * License:           GPL-2.0+
@@ -22,8 +22,9 @@ require_once __DIR__ . '/vendor/autoload.php';
 function run_epitrove_helper()
 {
     require plugin_dir_path(__FILE__).'includes/entities/class-epitrove-product.php';
+    require plugin_dir_path(__FILE__).'includes/trait-third-party-developers.php';
     require plugin_dir_path(__FILE__).'includes/class-epitrove-license.php';
-    new \Licensing\EpitroveLicense();
+    \Licensing\EpitroveLicense::getInstance();
 }
 
 run_epitrove_helper();
