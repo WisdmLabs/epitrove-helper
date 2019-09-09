@@ -13,7 +13,7 @@ For example, if name of your plugin or theme's folder is `hello`, then your func
 
 In order to avoid throwing fatal error when Epitrove Helper addon is not available or installed, you should write code like this
 
-`$licenseKey = method_exists('\Licensing\EpitroveLicense,'licenseKey') ? \Licensing\EpitroveLicense::licenseKey('hello') : '';`
+`$licenseKey = method_exists('\Licensing\EpitroveLicense','licenseKey') ? \Licensing\EpitroveLicense::licenseKey('hello') : '';`
 
 ### Check License Status
 To check the license status, you can use `\Licensing\EpitroveLicense::isActive(<NAME-OF-THE-FOLDER>)`.
@@ -23,4 +23,4 @@ This method returns `true`, if customer has entered license key on
 
 Similar to above example, correct way of checking this will be
 
-`$isActiveLicense = method_exists('\Licensing\EpitroveLicense,'isActive') ? \Licensing\EpitroveLicense::isActive('hello') : false;`
+`$isActiveLicense = method_exists('\Licensing\EpitroveLicense','isActive') ? \Licensing\EpitroveLicense::isActive('hello') : false;`
